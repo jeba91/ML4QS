@@ -19,4 +19,4 @@ for x in os.listdir(current_map):
         data["Time (s)"] = (data["Time (s)"].apply(lambda x: (x*1000000000)+epoch_time))
         data["label"] = x
         data.to_csv(save_map + y.split('.')[0] + "/" + x + "_" + y)
-    epoch_time += (data["Time (s)"].max()*1000000000)
+    # epoch_time += (data["Time (s)"].max()*1000000000)

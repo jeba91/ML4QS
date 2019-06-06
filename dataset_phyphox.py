@@ -1,4 +1,4 @@
-dataset_path = 'data_phyphox2/'
+dataset_path = 'data_phyphox1/Accelerometer/'
 result_dataset_path = 'own_datafiles/'
 
 # Import the relevant classes.
@@ -18,7 +18,7 @@ granularities = [60000, 250]
 datasets = []
 
 DataSet = CreateDataset(dataset_path, 1000)
-DataSet.add_numerical_dataset('biking.csv', 'Time (s)', ["X (m/s^2)","Y (m/s^2)","Z (m/s^2)"], 'avg', 'biking_')
+DataSet.add_numerical_dataset('biking_Accelerometer.csv', 'Time (s)', ["X (m/s^2)","Y (m/s^2)","Z (m/s^2)"], 'avg', 'biking_')
 
 dataset = DataSet.data_table
 
