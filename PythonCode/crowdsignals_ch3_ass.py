@@ -26,6 +26,7 @@ except IOError as e:
     raise e
 
 dataset.index = dataset.index.to_datetime()
+dataset = dataset.iloc[0:10000]
 
 # Compute the number of milliseconds covered by an instance based on the first two rows
 milliseconds_per_instance = (dataset.index[1] - dataset.index[0]).microseconds/1000
@@ -72,10 +73,10 @@ for col in outlier_columns:
 
 # We take Chauvent's criterion and apply it to all but the label data...
 
-for col in [c for c in dataset.columns if not 'label' in c]:
-    print 'Measurement is now: ' , col
-    dataset = OutlierDistr.chauvenet(dataset, col)
-    dataset.loc[dataset[col + '_outlier'] == True, col] = np.nan
-    del dataset[col + '_outlier']
+# for col in [c for c in dataset.columns if not 'label' in c]:
+#     print 'Measurement is now: ' , col
+#     dataset = OutlierDistr.chauvenet(dataset, col)
+#     dataset.loc[dataset[col + '_outlier'] == True, col] = np.nan
+#     del dataset[col + '_outlier']
 
-dataset.to_csv(dataset_path + 'chapter3_result_outliers.csv')
+# dataset.to_csv(dataset_path + 'chapter3_result_outliers.csv')
