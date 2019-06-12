@@ -162,3 +162,4 @@ class DistanceBasedOutlierDetection:
 
         # Return the average ratio.
         return sum(lrd_ratios_array) / len(neighbors)
+

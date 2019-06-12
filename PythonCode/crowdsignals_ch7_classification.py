@@ -34,7 +34,7 @@ dataset_path = './intermediate_datafiles/'
 export_tree_path = 'Example_graphs/Chapter7/'
 
 try:
-    dataset = pd.read_csv(dataset_path + 'chapter5_result.csv', index_col=0)
+    dataset = pd.read_csv(dataset_path + 'chapter5_own.csv', index_col=0)
 except IOError as e:
     print('File not found, try to run previous crowdsignals scripts first!')
     raise e
@@ -76,166 +76,166 @@ features_after_chapter_4 = list(set().union(basic_features, pca_features, time_f
 features_after_chapter_5 = list(set().union(basic_features, pca_features, time_features, freq_features, cluster_features))
 
 
-# First, let us consider the performance over a selection of features:
-
-fs = FeatureSelectionClassification()
-
-features, ordered_features, ordered_scores = fs.forward_selection(50, train_X[features_after_chapter_5], train_y)
-print ordered_scores
-print ordered_features
-
-plot.plot(range(1, 51), ordered_scores)
-plot.xlabel('number of features')
-plot.ylabel('accuracy')
-plot.show()
-
-# Based on the plot we select the top 10 features.
-
-selected_features = ['acc_phone_y_freq_0.0_Hz_ws_40', 'press_phone_pressure_temp_mean_ws_120', 'gyr_phone_x_temp_std_ws_120',
-                     'mag_watch_y_pse', 'mag_phone_z_max_freq', 'gyr_watch_y_freq_weighted', 'gyr_phone_y_freq_1.0_Hz_ws_40',
-                     'acc_phone_x_freq_1.9_Hz_ws_40', 'mag_watch_z_freq_0.9_Hz_ws_40', 'acc_watch_y_freq_0.5_Hz_ws_40']
-
-# Let us first study the impact of regularization and model complexity: does regularization prevent overfitting?
-
-learner = ClassificationAlgorithms()
-eval = ClassificationEvaluation()
-
-reg_parameters = [0.0001, 0.001, 0.01, 0.1, 1, 10]
-performance_training = []
-performance_test = []
-
-# We repeat the experiment a number of times to get a bit more robust data as the initialization of the NN is random.
-
-repeats = 20
-
-for reg_param in reg_parameters:
-    performance_tr = 0
-    performance_te = 0
-    for i in range(0, repeats):
-        class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.feedforward_neural_network(train_X, train_y,
-                                                                                                            test_X, hidden_layer_sizes=(250, ), alpha=reg_param, max_iter=500,
-                                                                                                            gridsearch=False)
-        performance_tr += eval.accuracy(train_y, class_train_y)
-        performance_te += eval.accuracy(test_y, class_test_y)
-    performance_training.append(performance_tr/repeats)
-    performance_test.append(performance_te/repeats)
-
-plot.hold(True)
-plot.semilogx(reg_parameters, performance_training, 'r-')
-plot.semilogx(reg_parameters, performance_test, 'b:')
-print performance_training
-print performance_test
-plot.xlabel('regularization parameter value')
-plot.ylabel('accuracy')
-plot.ylim([0.95, 1.01])
-plot.legend(['training', 'test'], loc=4)
-plot.hold(False)
-
-plot.show()
-
-# Second, let us consider the influence of certain parameter settings (very related to the regulariztion) and study the impact on performance.
-
-leaf_settings = [1,2,5,10]
-performance_training = []
-performance_test = []
-
-for no_points_leaf in leaf_settings:
-    class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(train_X[selected_features], train_y, test_X[selected_features], min_samples_leaf=no_points_leaf,
-                                                                                               gridsearch=False, print_model_details=False)
-    performance_training.append(eval.accuracy(train_y, class_train_y))
-    performance_test.append(eval.accuracy(test_y, class_test_y))
-
-plot.hold(True)
-plot.plot(leaf_settings, performance_training, 'r-')
-plot.plot(leaf_settings, performance_test, 'b:')
-plot.xlabel('minimum number of points per leaf')
-plot.ylabel('accuracy')
-plot.legend(['training', 'test'], loc=1)
-plot.hold(False)
-
-plot.show()
-
-
-# So yes, it is important :) Therefore we perform grid searches over the most important parameters, and do so by means
-# of cross validation upon the training set.
-
-
-possible_feature_sets = [basic_features, features_after_chapter_3, features_after_chapter_4, features_after_chapter_5, selected_features]
-feature_names = ['initial set', 'Chapter 3', 'Chapter 4', 'Chapter 5', 'Selected features']
-repeats = 5
-
-scores_over_all_algs = []
-
-for i in range(0, len(possible_feature_sets)):
-    selected_train_X = train_X[possible_feature_sets[i]]
-    selected_test_X = test_X[possible_feature_sets[i]]
-
-    # First we run our non deterministic classifiers a number of times to average their score.
-
-    performance_tr_nn = 0
-    performance_tr_rf = 0
-    performance_tr_svm = 0
-    performance_te_nn = 0
-    performance_te_rf = 0
-    performance_te_svm = 0
-
-    for repeat in range(0, repeats):
-        class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.feedforward_neural_network(selected_train_X, train_y, selected_test_X, gridsearch=True)
-        performance_tr_nn += eval.accuracy(train_y, class_train_y)
-        performance_te_nn += eval.accuracy(test_y, class_test_y)
-
-        class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.random_forest(selected_train_X, train_y, selected_test_X, gridsearch=True)
-        performance_tr_rf += eval.accuracy(train_y, class_train_y)
-        performance_te_rf += eval.accuracy(test_y, class_test_y)
-
-        class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.support_vector_machine_with_kernel(selected_train_X, train_y, selected_test_X, gridsearch=True)
-        performance_tr_svm += eval.accuracy(train_y, class_train_y)
-        performance_te_svm += eval.accuracy(test_y, class_test_y)
-
-
-    overall_performance_tr_nn = performance_tr_nn/repeats
-    overall_performance_te_nn = performance_te_nn/repeats
-    overall_performance_tr_rf = performance_tr_rf/repeats
-    overall_performance_te_rf = performance_te_rf/repeats
-    overall_performance_tr_svm = performance_tr_svm/repeats
-    overall_performance_te_svm = performance_te_svm/repeats
-
-    # And we run our deterministic classifiers:
-
-
-    class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.k_nearest_neighbor(selected_train_X, train_y, selected_test_X, gridsearch=True)
-    performance_tr_knn = eval.accuracy(train_y, class_train_y)
-    performance_te_knn = eval.accuracy(test_y, class_test_y)
-
-    class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(selected_train_X, train_y, selected_test_X, gridsearch=True)
-    performance_tr_dt = eval.accuracy(train_y, class_train_y)
-    performance_te_dt = eval.accuracy(test_y, class_test_y)
-
-    class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.naive_bayes(selected_train_X, train_y, selected_test_X)
-    performance_tr_nb = eval.accuracy(train_y, class_train_y)
-    performance_te_nb = eval.accuracy(test_y, class_test_y)
-
-    scores_with_sd = util.print_table_row_performances(feature_names[i], len(selected_train_X.index), len(selected_test_X.index), [
-                                                                                                (overall_performance_tr_nn, overall_performance_te_nn),
-                                                                                                (overall_performance_tr_rf, overall_performance_te_rf),
-                                                                                                (overall_performance_tr_svm, overall_performance_te_svm),
-                                                                                                (performance_tr_knn, performance_te_knn),
-                                                                                                (performance_tr_dt, performance_te_dt),
-                                                                                                (performance_tr_nb, performance_te_nb)])
-    scores_over_all_algs.append(scores_with_sd)
-
-DataViz.plot_performances_classification(['NN', 'RF', 'SVM', 'KNN', 'DT', 'NB'], feature_names, scores_over_all_algs)
-
-# And we study two promising ones in more detail. First let us consider the decision tree which works best with the selected
-# features.
+# # First, let us consider the performance over a selection of features:
 #
-class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(train_X[selected_features], train_y, test_X[selected_features],
-                                                                                           gridsearch=True,
-                                                                                           print_model_details=True, export_tree_path=export_tree_path)
-
-class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.random_forest(train_X[selected_features], train_y, test_X[selected_features],
-                                                                                           gridsearch=True, print_model_details=True)
-
-test_cm = eval.confusion_matrix(test_y, class_test_y, class_train_prob_y.columns)
-
-DataViz.plot_confusion_matrix(test_cm, class_train_prob_y.columns, normalize=False)
+# fs = FeatureSelectionClassification()
+#
+# features, ordered_features, ordered_scores = fs.forward_selection(50, train_X[features_after_chapter_5], train_y)
+# print ordered_scores
+# print ordered_features
+#
+# plot.plot(range(1, 51), ordered_scores)
+# plot.xlabel('number of features')
+# plot.ylabel('accuracy')
+# plot.show()
+#
+# # Based on the plot we select the top 10 features.
+#
+# selected_features = ['acc_phone_y_freq_0.0_Hz_ws_40', 'press_phone_pressure_temp_mean_ws_120', 'gyr_phone_x_temp_std_ws_120',
+#                      'mag_watch_y_pse', 'mag_phone_z_max_freq', 'gyr_watch_y_freq_weighted', 'gyr_phone_y_freq_1.0_Hz_ws_40',
+#                      'acc_phone_x_freq_1.9_Hz_ws_40', 'mag_watch_z_freq_0.9_Hz_ws_40', 'acc_watch_y_freq_0.5_Hz_ws_40']
+#
+# # Let us first study the impact of regularization and model complexity: does regularization prevent overfitting?
+#
+# learner = ClassificationAlgorithms()
+# eval = ClassificationEvaluation()
+#
+# reg_parameters = [0.0001, 0.001, 0.01, 0.1, 1, 10]
+# performance_training = []
+# performance_test = []
+#
+# # We repeat the experiment a number of times to get a bit more robust data as the initialization of the NN is random.
+#
+# repeats = 20
+#
+# for reg_param in reg_parameters:
+#     performance_tr = 0
+#     performance_te = 0
+#     for i in range(0, repeats):
+#         class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.feedforward_neural_network(train_X, train_y,
+#                                                                                                             test_X, hidden_layer_sizes=(250, ), alpha=reg_param, max_iter=500,
+#                                                                                                             gridsearch=False)
+#         performance_tr += eval.accuracy(train_y, class_train_y)
+#         performance_te += eval.accuracy(test_y, class_test_y)
+#     performance_training.append(performance_tr/repeats)
+#     performance_test.append(performance_te/repeats)
+#
+# plot.hold(True)
+# plot.semilogx(reg_parameters, performance_training, 'r-')
+# plot.semilogx(reg_parameters, performance_test, 'b:')
+# print performance_training
+# print performance_test
+# plot.xlabel('regularization parameter value')
+# plot.ylabel('accuracy')
+# plot.ylim([0.95, 1.01])
+# plot.legend(['training', 'test'], loc=4)
+# plot.hold(False)
+#
+# plot.show()
+#
+# # Second, let us consider the influence of certain parameter settings (very related to the regulariztion) and study the impact on performance.
+#
+# leaf_settings = [1,2,5,10]
+# performance_training = []
+# performance_test = []
+#
+# for no_points_leaf in leaf_settings:
+#     class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(train_X[selected_features], train_y, test_X[selected_features], min_samples_leaf=no_points_leaf,
+#                                                                                                gridsearch=False, print_model_details=False)
+#     performance_training.append(eval.accuracy(train_y, class_train_y))
+#     performance_test.append(eval.accuracy(test_y, class_test_y))
+#
+# plot.hold(True)
+# plot.plot(leaf_settings, performance_training, 'r-')
+# plot.plot(leaf_settings, performance_test, 'b:')
+# plot.xlabel('minimum number of points per leaf')
+# plot.ylabel('accuracy')
+# plot.legend(['training', 'test'], loc=1)
+# plot.hold(False)
+#
+# plot.show()
+#
+#
+# # So yes, it is important :) Therefore we perform grid searches over the most important parameters, and do so by means
+# # of cross validation upon the training set.
+#
+#
+# possible_feature_sets = [basic_features, features_after_chapter_3, features_after_chapter_4, features_after_chapter_5, selected_features]
+# feature_names = ['initial set', 'Chapter 3', 'Chapter 4', 'Chapter 5', 'Selected features']
+# repeats = 5
+#
+# scores_over_all_algs = []
+#
+# for i in range(0, len(possible_feature_sets)):
+#     selected_train_X = train_X[possible_feature_sets[i]]
+#     selected_test_X = test_X[possible_feature_sets[i]]
+#
+#     # First we run our non deterministic classifiers a number of times to average their score.
+#
+#     performance_tr_nn = 0
+#     performance_tr_rf = 0
+#     performance_tr_svm = 0
+#     performance_te_nn = 0
+#     performance_te_rf = 0
+#     performance_te_svm = 0
+#
+#     for repeat in range(0, repeats):
+#         class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.feedforward_neural_network(selected_train_X, train_y, selected_test_X, gridsearch=True)
+#         performance_tr_nn += eval.accuracy(train_y, class_train_y)
+#         performance_te_nn += eval.accuracy(test_y, class_test_y)
+#
+#         class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.random_forest(selected_train_X, train_y, selected_test_X, gridsearch=True)
+#         performance_tr_rf += eval.accuracy(train_y, class_train_y)
+#         performance_te_rf += eval.accuracy(test_y, class_test_y)
+#
+#         class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.support_vector_machine_with_kernel(selected_train_X, train_y, selected_test_X, gridsearch=True)
+#         performance_tr_svm += eval.accuracy(train_y, class_train_y)
+#         performance_te_svm += eval.accuracy(test_y, class_test_y)
+#
+#
+#     overall_performance_tr_nn = performance_tr_nn/repeats
+#     overall_performance_te_nn = performance_te_nn/repeats
+#     overall_performance_tr_rf = performance_tr_rf/repeats
+#     overall_performance_te_rf = performance_te_rf/repeats
+#     overall_performance_tr_svm = performance_tr_svm/repeats
+#     overall_performance_te_svm = performance_te_svm/repeats
+#
+#     # And we run our deterministic classifiers:
+#
+#
+#     class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.k_nearest_neighbor(selected_train_X, train_y, selected_test_X, gridsearch=True)
+#     performance_tr_knn = eval.accuracy(train_y, class_train_y)
+#     performance_te_knn = eval.accuracy(test_y, class_test_y)
+#
+#     class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(selected_train_X, train_y, selected_test_X, gridsearch=True)
+#     performance_tr_dt = eval.accuracy(train_y, class_train_y)
+#     performance_te_dt = eval.accuracy(test_y, class_test_y)
+#
+#     class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.naive_bayes(selected_train_X, train_y, selected_test_X)
+#     performance_tr_nb = eval.accuracy(train_y, class_train_y)
+#     performance_te_nb = eval.accuracy(test_y, class_test_y)
+#
+#     scores_with_sd = util.print_table_row_performances(feature_names[i], len(selected_train_X.index), len(selected_test_X.index), [
+#                                                                                                 (overall_performance_tr_nn, overall_performance_te_nn),
+#                                                                                                 (overall_performance_tr_rf, overall_performance_te_rf),
+#                                                                                                 (overall_performance_tr_svm, overall_performance_te_svm),
+#                                                                                                 (performance_tr_knn, performance_te_knn),
+#                                                                                                 (performance_tr_dt, performance_te_dt),
+#                                                                                                 (performance_tr_nb, performance_te_nb)])
+#     scores_over_all_algs.append(scores_with_sd)
+#
+# DataViz.plot_performances_classification(['NN', 'RF', 'SVM', 'KNN', 'DT', 'NB'], feature_names, scores_over_all_algs)
+#
+# # And we study two promising ones in more detail. First let us consider the decision tree which works best with the selected
+# # features.
+# #
+# class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(train_X[selected_features], train_y, test_X[selected_features],
+#                                                                                            gridsearch=True,
+#                                                                                            print_model_details=True, export_tree_path=export_tree_path)
+#
+# class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.random_forest(train_X[selected_features], train_y, test_X[selected_features],
+#                                                                                            gridsearch=True, print_model_details=True)
+#
+# test_cm = eval.confusion_matrix(test_y, class_test_y, class_train_prob_y.columns)
+#
+# DataViz.plot_confusion_matrix(test_cm, class_train_prob_y.columns, normalize=False)

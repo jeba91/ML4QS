@@ -1,6 +1,0 @@
-sensor_type,device_type,label,label_start,label_start_datetime,label_end,label_end_datetime
-interval_label,smartphone,Nothing,1559653200000000000, 2019-06-04 13:00:00, 1.559653556e+18, 2019-06-04 13:05:56
-interval_label,smartphone,Walking, 1.559653556e+18, 2019-06-04 13:05:56, 1.559654092e+18, 2019-06-04 13:14:52
-interval_label,smartphone,Climbing_stairs, 1.559654092e+18, 2019-06-04 13:14:52, 1.55965432e+18, 2019-06-04 13:18:40
-interval_label,smartphone,Biking, 1.55965432e+18, 2019-06-04 13:18:40, 1.559654527e+18, 2019-06-04 13:22:07
-interval_label,smartphone,Train, 1.559654527e+18, 2019-06-04 13:22:07, 1.559655039e+18, 2019-06-04 13:30:39

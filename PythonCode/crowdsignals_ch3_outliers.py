@@ -56,7 +56,7 @@ for col in outlier_columns:
     except MemoryError as e:
         print('Not enough memory available for simple distance-based outlier detection...')
         print('Skipping.')
-
+    
     try:
         dataset = OutlierDist.local_outlier_factor(dataset, [col], 'euclidean', 5)
         DataViz.plot_dataset(dataset, [col, 'lof'], ['exact','exact'], ['line', 'points'])
