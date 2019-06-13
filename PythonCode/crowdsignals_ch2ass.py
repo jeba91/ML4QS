@@ -96,4 +96,4 @@ print(cols_pre1)
 #
 # print(dataset.columns)
 
-dataset.to_csv(result_dataset_path + "chapter2_own.csv")
+# dataset.to_csv(result_dataset_path + "chapter2_own.csv")
