@@ -88,21 +88,22 @@ class VisualizeDataset:
 
     # Plot outliers in case of a binary outlier score. Here, the col specifies the real data
     # column and outlier_col the columns with a binary value (outlier or not)
-    def plot_binary_outliers(self, data_table, col, outlier_col):
+    def plot_binary_outliers(self, data_table, col, outlier_col, subplot):
         data_table = data_table.dropna(axis=0, subset=[col, outlier_col])
         data_table[outlier_col] = data_table[outlier_col].astype('bool')
         f, xar = plot.subplots()
         plot.hold(True)
         xfmt = md.DateFormatter('%H:%M')
-        xar.xaxis.set_major_formatter(xfmt)
-        plot.xlabel('time')
-        plot.ylabel('value')
+        subplot.xaxis.set_major_formatter(xfmt)
+        # subplot.xlabel('time')
+        # subplot.ylabel('value')
         # Plot data points that are outliers in red, and non outliers in blue.
-        xar.plot(data_table.index[data_table[outlier_col]], data_table[col][data_table[outlier_col]], 'r+')
-        xar.plot(data_table.index[~data_table[outlier_col]], data_table[col][~data_table[outlier_col]], 'b+')
-        plot.legend(['outlier ' + col, 'no outlier' + col], numpoints=1, fontsize='xx-small', loc='upper center',  ncol=2, fancybox=True, shadow=True)
-        plot.hold(False)
-        plot.show()
+        subplot.plot(data_table.index[data_table[outlier_col]], data_table[col][data_table[outlier_col]], 'r+')
+        subplot.plot(data_table.index[~data_table[outlier_col]], data_table[col][~data_table[outlier_col]], 'b+')
+        # subplot.legend(['outlier ' + col, 'no outlier' + col], numpoints=1, fontsize='xx-small', loc='upper center',  ncol=2, fancybox=True, shadow=True)
+        # subplot.hold(False)
+        # subplot.show()
+        # return plot
 
     # Plot values that have been imputed using one of our imputation approaches. Here, values expresses the
     # 1 to n datasets that have resulted from value imputation.
@@ -304,7 +305,8 @@ class VisualizeDataset:
         plot.annotate('', xy=(test_time[0], y_coord_labels), xycoords='data', xytext=(test_time[-1], y_coord_labels), textcoords='data', arrowprops={'arrowstyle': '<->'})
         plot.annotate('test set', xy=(test_time[int(float(len(test_time))/2)], y_coord_labels*1.02), color='red', xycoords='data', ha='center')
         plot.hold(False)
-        plot.show()
+        # plot.show()
+        return plot
 
     # Plot the Pareto front for multi objective optimization problems (for the dynamical systems stuff). We consider the
     # raw output of the MO dynamical systems approach, which includes rows with the fitness and predictions for the training

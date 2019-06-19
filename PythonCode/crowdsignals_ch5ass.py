@@ -36,7 +36,10 @@ dataset.index = dataset.index.to_datetime()
 for col in dataset.columns:
     print(col)
 
-printing = ['acc_X (m/s^2)', 'acc_Y (m/s^2)', 'acc_Z (m/s^2)']
+# printing = ['acc_X (m/s^2)', 'acc_Y (m/s^2)', 'acc_Z (m/s^2)']
+# printing = ['gyr_X (rad/s)', 'gyr_Y (rad/s)', 'gyr_Z (rad/s)']
+printing = ['mag_X (muT)', 'mag_Y (muT)', 'mag_Z (muT)']
+
 
 # First let us use non hierarchical clustering.
 
@@ -63,9 +66,11 @@ plot.ylabel('silhouette score')
 plot.ylim([0,1])
 plot.show()
 
+print(silhouette_values)
 # And run the knn with the highest silhouette score
+k = k_values[silhouette_values.index(max(silhouette_values))]
+# k = 5
 
-k = 6
 
 dataset_knn = clusteringNH.k_means_over_instances(copy.deepcopy(dataset), [printing[0], printing[1], printing[2]], k, 'default', 50, 50)
 DataViz.plot_clusters_3d(dataset_knn, [printing[0], printing[1], printing[2]], 'cluster', ['label'])
@@ -95,7 +100,8 @@ plot.show()
 
 # And run k medoids with the highest silhouette score
 
-k = 6
+k = k_values[silhouette_values.index(max(silhouette_values))]
+# k = 5
 
 dataset_kmed = clusteringNH.k_medoids_over_instances(copy.deepcopy(dataset), [printing[0], printing[1], printing[2]], k, 'default', 20, n_inits=50)
 DataViz.plot_clusters_3d(dataset_kmed, [printing[0], printing[1], printing[2]], 'cluster', ['label'])
@@ -129,4 +135,4 @@ plot.show()
 
 # And we select the outcome dataset of the knn clustering....
 
-dataset_knn.to_csv(dataset_path + 'chapter5_own.csv')
+# dataset_knn.to_csv(dataset_path + 'chapter5_own1.csv')

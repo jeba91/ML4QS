@@ -432,7 +432,6 @@ class TemporalRegressionAlgorithms:
 
         # Set the desired/known values in our evaluator.
         evaluator.set_values(model, train_X, train_y, test_X, test_y, targets)
-
         # Initialize the NSGA2 algorithm.
         ea = inspyred.ec.emo.NSGA2(prng)
         ea.variator = [inspyred.ec.variators.blend_crossover,

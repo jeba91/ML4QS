@@ -73,11 +73,11 @@ dataset = FreqAbs.abstract_frequency(dataset, periodic_predictor_cols, int(float
 # Now we only take a certain percentage of overlap in the windows, otherwise our training examples will be too much alike.
 
 # The percentage of overlap we allow
-window_overlap = 0.9
+window_overlap = 0.1
 skip_points = int((1-window_overlap) * ws)
 dataset = dataset.iloc[::skip_points,:]
 
 
-dataset.to_csv(dataset_path + 'chapter4_own.csv')
+dataset.to_csv(dataset_path + 'chapter4_own1.csv')
 
 # DataViz.plot_dataset(dataset, ['acc_phone_x', 'gyr_phone_x', 'hr_watch_rate', 'light_phone_lux', 'mag_phone_x', 'press_phone_', 'pca_1', 'label'], ['like', 'like', 'like', 'like', 'like', 'like', 'like','like'], ['line', 'line', 'line', 'line', 'line', 'line', 'line', 'points'])

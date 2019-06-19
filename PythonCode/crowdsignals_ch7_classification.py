@@ -52,7 +52,7 @@ dataset.index = dataset.index.to_datetime()
 
 prepare = PrepareDatasetForLearning()
 
-train_X, test_X, train_y, test_y = prepare.split_single_dataset_classification(dataset, ['label'], 'like', 0.7, filter=True, temporal=False)
+train_X, test_X, train_y, test_y = prepare.split_single_dataset_classification(dataset, ['label'], 'like1', 0.7, filter=True, temporal=False)
 #train_X, test_X, train_y, test_y = prepare.split_single_dataset_classification(dataset, ['label'], 'like', 0.01, filter=True, temporal=False)
 
 print 'Training set length is: ', len(train_X.index)

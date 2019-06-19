@@ -34,7 +34,7 @@ dataset_path = './intermediate_datafiles/'
 export_tree_path = 'Example_graphs/Chapter7/'
 
 try:
-    dataset = pd.read_csv(dataset_path + 'chapter5_own.csv', index_col=0)
+    dataset = pd.read_csv(dataset_path + 'chapter5_own6.csv', index_col=0)
 except IOError as e:
     print('File not found, try to run previous crowdsignals scripts first!')
     raise e
@@ -238,12 +238,15 @@ DataViz.plot_performances_classification(['NN', 'RF', 'SVM', 'KNN', 'DT', 'NB'],
 # And we study two promising ones in more detail. First let us consider the decision tree which works best with the selected
 # features.
 #
-class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(train_X[selected_features], train_y, test_X[selected_features],
-                                                                                           gridsearch=True,
-                                                                                           print_model_details=True, export_tree_path=export_tree_path)
+# class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.decision_tree(train_X[selected_features], train_y, test_X[selected_features],
+#                                                                                            gridsearch=True,
+#                                                                                            print_model_details=True, export_tree_path=export_tree_path)
+#
+# class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.random_forest(train_X[selected_features], train_y, test_X[selected_features],
+#                                                                                            gridsearch=True, print_model_details=True)
 
-class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.random_forest(train_X[selected_features], train_y, test_X[selected_features],
-                                                                                           gridsearch=True, print_model_details=True)
+class_train_y, class_test_y, class_train_prob_y, class_test_prob_y = learner.support_vector_machine_with_kernel(train_X[selected_features], train_y, test_X[selected_features],
+                                                                                            gridsearch=True, print_model_details=True)
 
 test_cm = eval.confusion_matrix(test_y, class_test_y, class_train_prob_y.columns)
 
