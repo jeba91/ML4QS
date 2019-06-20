@@ -69,6 +69,7 @@ class VisualizeDataset:
         plot.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
         plot.xlabel('time')
         plot.show()
+        # return xar
 
     def plot_dataset_boxplot(self, dataset, cols):
         ax = dataset[cols].plot.box()
@@ -95,14 +96,14 @@ class VisualizeDataset:
         plot.hold(True)
         xfmt = md.DateFormatter('%H:%M')
         subplot.xaxis.set_major_formatter(xfmt)
-        # subplot.xlabel('time')
-        # subplot.ylabel('value')
+        subplot.xlabel('time')
+        subplot.ylabel('value')
         # Plot data points that are outliers in red, and non outliers in blue.
         subplot.plot(data_table.index[data_table[outlier_col]], data_table[col][data_table[outlier_col]], 'r+')
         subplot.plot(data_table.index[~data_table[outlier_col]], data_table[col][~data_table[outlier_col]], 'b+')
-        # subplot.legend(['outlier ' + col, 'no outlier' + col], numpoints=1, fontsize='xx-small', loc='upper center',  ncol=2, fancybox=True, shadow=True)
-        # subplot.hold(False)
-        # subplot.show()
+        subplot.legend(['outlier ' + col, 'no outlier' + col], numpoints=1, fontsize='xx-small', loc='upper center',  ncol=2, fancybox=True, shadow=True)
+        subplot.hold(False)
+        subplot.show()
         # return plot
 
     # Plot values that have been imputed using one of our imputation approaches. Here, values expresses the

@@ -61,4 +61,4 @@ DataSet.add_event_dataset('labels.csv', 'label_start', 'label_end', 'label', 'bi
 
 dataset = DataSet.data_table
 
-dataset.to_csv(result_dataset_path + "chapter2_final2hz.csv")
+dataset.to_csv(result_dataset_path + "chapter2_final2s.csv")

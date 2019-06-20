@@ -59,7 +59,6 @@ class PrepareDatasetForLearning:
             class_labels = self.class_col
         elif len(class_labels) == 1:
             class_labels = class_labels[0]
-
         # Filer NaN is desired and those for which we cannot determine the class should be removed.
         if filter:
             dataset = dataset.dropna()

@@ -53,7 +53,7 @@ class DistributionBasedOutlierDetection:
     def mixture_model(self, data_table, col):
         # Fit a mixture model to our data.
         data = data_table[data_table[col].notnull()][col]
-        g = mixture.GMM(n_components=3, n_iter=1)
+        g = mixture.GMM(n_components=4, n_iter=10)
 
         g.fit(data.reshape(-1,1))
 
@@ -162,4 +162,3 @@ class DistanceBasedOutlierDetection:
 
         # Return the average ratio.
         return sum(lrd_ratios_array) / len(neighbors)
-
