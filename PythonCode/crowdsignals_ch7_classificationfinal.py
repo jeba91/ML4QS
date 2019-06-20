@@ -163,10 +163,20 @@ eval = ClassificationEvaluation()
 # So yes, it is important :) Therefore we perform grid searches over the most important parameters, and do so by means
 # of cross validation upon the training set.
 
+# HIER VERANDEREN
+# Uncomment possible_feature_sets en feature_names die bij je naam staan
 
-possible_feature_sets = [basic_features, features_after_chapter_3, features_after_chapter_4, features_after_chapter_5, selected_features]
-feature_names = ['initial set', 'Chapter 3', 'Chapter 4', 'Chapter 5', 'Selected features']
-repeats = 5
+# ik
+# possible_feature_sets = [basic_features, features_after_chapter_3, features_after_chapter_4, features_after_chapter_5, selected_features]
+# feature_names = ['initial set', 'Chapter 3', 'Chapter 4', 'Chapter 5', 'Selected features']
+
+# roos
+# possible_feature_sets = [ selected_features]
+# feature_names = ['Selected features']
+
+# robin
+# possible_feature_sets = [features_after_chapter_5]
+# feature_names = ['Chapter 5']
 
 scores_over_all_algs = []
 
